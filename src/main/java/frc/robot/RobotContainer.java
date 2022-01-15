@@ -4,16 +4,23 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
 import org.slf4j.Logger;
 import org.usfirst.frc3620.logger.EventLogging;
 import org.usfirst.frc3620.logger.EventLogging.Level;
 import org.usfirst.frc3620.misc.CANDeviceFinder;
+import org.usfirst.frc3620.misc.CANDeviceType;
+import org.usfirst.frc3620.misc.XBoxConstants;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import frc.robot.commands.ShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,17 +35,33 @@ public class RobotContainer {
   static CANDeviceFinder canDeviceFinder;
 
   // The robot's subsystems and commands are defined here...
-  private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
+  static ShooterSubsystem shooterSubsystem;
 
-  private final ShooterCommand m_shooterCommand = new ShooterCommand(m_shooterSubsystem);
+  static TalonFX top, bottom;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     canDeviceFinder = new CANDeviceFinder();
     logger.info ("CAN bus: " + canDeviceFinder.getDeviceSet());
 
+    makeHardware();
+    makeSubsystems();
+
     // Configure the button bindings
     configureButtonBindings();
+  }
+
+  void makeHardware() {
+    if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 1, "top motor")) {
+      top = new TalonFX(1);
+    }
+    if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 2, "bottom motor")) {
+      bottom = new TalonFX(2);
+    }
+  }
+
+  void makeSubsystems() {
+    shooterSubsystem = new ShooterSubsystem(top, bottom);
   }
 
   /**
@@ -47,6 +70,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    Joystick driverJoystick = new Joystick(0);
+    new JoystickButton(driverJoystick, XBoxConstants.BUTTON_A).toggleWhenPressed(new ShooterCommand(shooterSubsystem));
+  }
 
 }

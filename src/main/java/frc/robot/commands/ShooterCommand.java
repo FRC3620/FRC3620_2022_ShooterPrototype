@@ -4,13 +4,19 @@
 
 package frc.robot.commands;
 
+import frc.robot.ShootingDataLogger;
 import frc.robot.subsystems.ShooterSubsystem;
+
+import org.usfirst.frc3620.logger.IFastDataLogger;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** An example command that uses an example subsystem. */
 public class ShooterCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final ShooterSubsystem m_subsystem;
+  IFastDataLogger dataLogger;
 
   /**
    * Creates a new ExampleCommand.
@@ -25,7 +31,13 @@ public class ShooterCommand extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    boolean shouldDoDataLogging = SmartDashboard.getBoolean("datalogging.enabled", false);
+    if (shouldDoDataLogging) {
+      dataLogger = ShootingDataLogger.getShootingDataLogger("shooter_m", m_subsystem);
+      dataLogger.start();
+    }
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -33,7 +45,14 @@ public class ShooterCommand extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_subsystem.setTopRPM(0);
+    m_subsystem.setBottomRPM(0);
+    if (dataLogger != null) {
+      // dataLogger.done();
+      dataLogger = null;
+    }
+  }
 
   // Returns true when the command should end.
   @Override
