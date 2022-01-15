@@ -41,7 +41,12 @@ public class ShooterCommand extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    double t = SmartDashboard.getNumber("top.set", 0.0);
+    double b = SmartDashboard.getNumber("bottom.set", 0.0);
+    m_subsystem.setTopRPM(t);
+    m_subsystem.setBottomRPM(t);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
