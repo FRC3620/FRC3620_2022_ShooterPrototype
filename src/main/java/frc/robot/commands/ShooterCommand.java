@@ -7,7 +7,10 @@ package frc.robot.commands;
 import frc.robot.ShootingDataLogger;
 import frc.robot.subsystems.ShooterSubsystem;
 
+import org.slf4j.Logger;
+import org.usfirst.frc3620.logger.EventLogging;
 import org.usfirst.frc3620.logger.IFastDataLogger;
+import org.usfirst.frc3620.logger.EventLogging.Level;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -16,6 +19,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class ShooterCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final ShooterSubsystem m_subsystem;
+
+  public final static Logger logger = EventLogging.getLogger(ShooterCommand.class, Level.INFO);
+
   IFastDataLogger dataLogger;
 
   /**
@@ -44,8 +50,9 @@ public class ShooterCommand extends CommandBase {
   public void execute() {
     double t = SmartDashboard.getNumber("top.set", 0.0);
     double b = SmartDashboard.getNumber("bottom.set", 0.0);
+    logger.info ("execute: {} {}", t, b);
     m_subsystem.setTopRPM(t);
-    m_subsystem.setBottomRPM(t);
+    m_subsystem.setBottomRPM(b);
   }
 
   // Called once the command ends or is interrupted.

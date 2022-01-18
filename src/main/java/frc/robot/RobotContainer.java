@@ -11,16 +11,11 @@ import org.usfirst.frc3620.logger.EventLogging;
 import org.usfirst.frc3620.logger.EventLogging.Level;
 import org.usfirst.frc3620.misc.CANDeviceFinder;
 import org.usfirst.frc3620.misc.CANDeviceType;
-import org.usfirst.frc3620.misc.XBoxConstants;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import frc.robot.commands.ShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -37,7 +32,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   static ShooterSubsystem shooterSubsystem;
 
-  static TalonFX top, bottom;
+  static TalonFX top1, top2, bottom;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -52,16 +47,19 @@ public class RobotContainer {
   }
 
   void makeHardware() {
-    if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 1, "top motor")) {
-      top = new TalonFX(1);
+    if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 1, "top motor 1")) {
+      top1 = new TalonFX(1);
     }
-    if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 2, "bottom motor")) {
-      bottom = new TalonFX(2);
+    if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 2, "top motor 1")) {
+      top2 = new TalonFX(2);
+    }
+    if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 3, "bottom motor")) {
+      bottom = new TalonFX(3);
     }
   }
 
   void makeSubsystems() {
-    shooterSubsystem = new ShooterSubsystem(top, bottom);
+    shooterSubsystem = new ShooterSubsystem(top1, top2, bottom);
   }
 
   /**
@@ -71,8 +69,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    Joystick driverJoystick = new Joystick(0);
-    new JoystickButton(driverJoystick, XBoxConstants.BUTTON_A).toggleWhenPressed(new ShooterCommand(shooterSubsystem));
+    //Joystick driverJoystick = new Joystick(0);
+    // new JoystickButton(driverJoystick, XBoxConstants.BUTTON_A).toggleWhenPressed(new ShooterCommand(shooterSubsystem));
+    shooterSubsystem.setDefaultCommand(new ShooterCommand(shooterSubsystem));
   }
 
 }

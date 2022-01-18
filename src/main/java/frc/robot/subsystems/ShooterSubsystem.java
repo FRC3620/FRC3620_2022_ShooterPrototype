@@ -11,11 +11,17 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import org.slf4j.Logger;
+import org.usfirst.frc3620.logger.EventLogging;
+import org.usfirst.frc3620.logger.EventLogging.Level;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ShooterSubsystem extends SubsystemBase {
-  TalonFX m_top, m_bottom;
+  public final static Logger logger = EventLogging.getLogger(ShooterSubsystem.class, Level.INFO);
+
+  TalonFX m_top1, m_top2, m_bottom;
 
   private final int kTimeoutMs = 0;
   private final int kVelocitySlotIdx = 0;
@@ -32,27 +38,28 @@ public class ShooterSubsystem extends SubsystemBase {
   private final double bIVelocity = 0.00;//0.0000001
   private final double bDVelocity = 0;//7.5
 
-  public ShooterSubsystem(TalonFX _top, TalonFX _bottom) {
-    this.m_top = _top;
+  public ShooterSubsystem(TalonFX _top1, TalonFX _top2, TalonFX _bottom) {
+    this.m_top1 = _top1;
     this.m_bottom = _bottom;
 
-    if (m_top != null) {
-      setupMotor(m_top);
+    if (m_top1 != null) {
+      setupMotor(m_top1);
 
       //for PID you have to have a sensor to check on so you know the error
-      m_top.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, kVelocitySlotIdx, kTimeoutMs);
-
-      //set max and minium(nominal) speed in percentage output
-      m_top.configNominalOutputForward(0, kTimeoutMs);
-      m_top.configNominalOutputReverse(0, kTimeoutMs);
-      m_top.configPeakOutputForward(+1, kTimeoutMs);
-      m_top.configPeakOutputReverse(-1, kTimeoutMs);
+      m_top1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, kVelocitySlotIdx, kTimeoutMs);
 
       //set up the topfalcon for using FPID
-      m_top.config_kF(kVelocitySlotIdx, tFVelocity, kTimeoutMs);
-      m_top.config_kP(kVelocitySlotIdx, tPVelocity, kTimeoutMs);
-      m_top.config_kI(kVelocitySlotIdx, tIVelocity, kTimeoutMs);
-      m_top.config_kD(kVelocitySlotIdx, tDVelocity, kTimeoutMs);
+      m_top1.config_kF(kVelocitySlotIdx, tFVelocity, kTimeoutMs);
+      m_top1.config_kP(kVelocitySlotIdx, tPVelocity, kTimeoutMs);
+      m_top1.config_kI(kVelocitySlotIdx, tIVelocity, kTimeoutMs);
+      m_top1.config_kD(kVelocitySlotIdx, tDVelocity, kTimeoutMs);
+    }
+
+    if (m_top2 != null) {
+      setupMotor(m_top2);
+      
+      m_top2.follow(m_top1);
+      m_top2.setInverted(InvertType.OpposeMaster);
     }
 
     if (m_bottom != null) {
@@ -60,12 +67,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
       //for PID you have to have a sensor to check on so you know the error
       m_bottom.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, kVelocitySlotIdx, kTimeoutMs);
-
-      //set max and minium(nominal) speed in percentage output
-      m_bottom.configNominalOutputForward(0, kTimeoutMs);
-      m_bottom.configNominalOutputReverse(0, kTimeoutMs);
-      m_bottom.configPeakOutputForward(+1, kTimeoutMs);
-      m_bottom.configPeakOutputReverse(-1, kTimeoutMs);
 
       //set up the bottomfalcon for using FPID
       m_bottom.config_kF(kVelocitySlotIdx, bFVelocity, kTimeoutMs);
@@ -78,6 +79,13 @@ public class ShooterSubsystem extends SubsystemBase {
   void setupMotor(TalonFX m) {
     m.configFactoryDefault();
     m.setInverted(InvertType.None);
+
+    //set max and minium(nominal) speed in percentage output
+    m_top1.configNominalOutputForward(0, kTimeoutMs);
+    m_top1.configNominalOutputReverse(0, kTimeoutMs);
+    m_top1.configPeakOutputForward(+1, kTimeoutMs);
+    m_top1.configPeakOutputReverse(-1, kTimeoutMs);
+    
     StatorCurrentLimitConfiguration amprage=new StatorCurrentLimitConfiguration(true,40,0,0); 
     m.configStatorCurrentLimit(amprage);
     m.setNeutralMode(NeutralMode.Coast);
@@ -89,10 +97,11 @@ public class ShooterSubsystem extends SubsystemBase {
       if (r == 0) {
         m.set(ControlMode.PercentOutput, 0);
       } else {
-        targetVelocity = r * 2048 / 600;
+        targetVelocity = r * 2048.0 / 600.0;
         m.set(ControlMode.Velocity, targetVelocity);
       }
     }
+    logger.info ("setRpm {} {}", s.name, r);
     s.requestedRPM = r;
     s.requestedSensorVelocity = targetVelocity;
     SmartDashboard.putNumber(s.name + ".rpm.target", r);
@@ -100,7 +109,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void setTopRPM(double r) {
-    setRpm(m_top, r, s_top);
+    setRpm(m_top1, r, s_top);
   }
 
   public void setBottomRPM(double r) {
@@ -140,7 +149,7 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    gatherActuals(s_top, m_top, "top");
+    gatherActuals(s_top, m_top1, "top");
     gatherActuals(s_bottom, m_bottom, "bottom");
   }
 
