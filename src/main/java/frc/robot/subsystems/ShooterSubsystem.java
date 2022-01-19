@@ -101,7 +101,7 @@ public class ShooterSubsystem extends SubsystemBase {
         m.set(ControlMode.Velocity, targetVelocity);
       }
     }
-    logger.info ("setRpm {} {}", s.name, r);
+    //logger.info ("setRpm {} {}", s.name, r);
     s.requestedRPM = r;
     s.requestedSensorVelocity = targetVelocity;
     SmartDashboard.putNumber(s.name + ".rpm.target", r);

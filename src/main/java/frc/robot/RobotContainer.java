@@ -12,8 +12,10 @@ import org.usfirst.frc3620.logger.EventLogging.Level;
 import org.usfirst.frc3620.misc.CANDeviceFinder;
 import org.usfirst.frc3620.misc.CANDeviceType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -33,6 +35,8 @@ public class RobotContainer {
   static ShooterSubsystem shooterSubsystem;
 
   static TalonFX top1, top2, bottom;
+
+  DigitalInput daButton;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -56,6 +60,7 @@ public class RobotContainer {
     if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 3, "bottom motor")) {
       bottom = new TalonFX(3);
     }
+    daButton = new DigitalInput(9);
   }
 
   void makeSubsystems() {
@@ -71,7 +76,13 @@ public class RobotContainer {
   private void configureButtonBindings() {
     //Joystick driverJoystick = new Joystick(0);
     // new JoystickButton(driverJoystick, XBoxConstants.BUTTON_A).toggleWhenPressed(new ShooterCommand(shooterSubsystem));
-    shooterSubsystem.setDefaultCommand(new ShooterCommand(shooterSubsystem));
+    //shooterSubsystem.setDefaultCommand(new ShooterCommand(shooterSubsystem));
+
+    new Trigger(this::reverseDaButton).debounce(0.1).whileActiveOnce(new ShooterCommand(shooterSubsystem));
+  }
+
+  boolean reverseDaButton() {
+    return !daButton.get();
   }
 
 }

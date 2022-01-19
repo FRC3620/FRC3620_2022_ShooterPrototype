@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     logger = EventLogging.getLogger(Robot.class, Level.INFO);
     logger.info ("I'm alive! {}", GitNess.gitDescription());
-    logger.info ("the long version: {}", GitNess.gitString());
+    // logger.info ("the long version: {}", GitNess.gitString());
 
     PortForwarder.add (10080, "frcvision.local", 80);
     PortForwarder.add (10022, "frcvision.local", 22);

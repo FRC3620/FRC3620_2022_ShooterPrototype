@@ -50,7 +50,7 @@ public class ShooterCommand extends CommandBase {
   public void execute() {
     double t = SmartDashboard.getNumber("top.set", 0.0);
     double b = SmartDashboard.getNumber("bottom.set", 0.0);
-    logger.info ("execute: {} {}", t, b);
+    //logger.info ("execute: {} {}", t, b);
     m_subsystem.setTopRPM(t);
     m_subsystem.setBottomRPM(b);
   }
