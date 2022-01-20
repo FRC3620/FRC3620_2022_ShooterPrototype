@@ -54,7 +54,7 @@ public class RobotContainer {
     if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 1, "top motor 1")) {
       top1 = new TalonFX(1);
     }
-    if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 2, "top motor 1")) {
+    if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 2, "top motor 2")) {
       top2 = new TalonFX(2);
     }
     if (canDeviceFinder.isDevicePresent(CANDeviceType.TALON, 3, "bottom motor")) {

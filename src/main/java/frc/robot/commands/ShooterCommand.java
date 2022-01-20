@@ -33,6 +33,8 @@ public class ShooterCommand extends CommandBase {
     m_subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
+    SmartDashboard.putNumber("top.set", 0.0);
+    SmartDashboard.putNumber("bottom.set", 0.0);
   }
 
   // Called when the command is initially scheduled.

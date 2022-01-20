@@ -40,10 +40,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public ShooterSubsystem(TalonFX _top1, TalonFX _top2, TalonFX _bottom) {
     this.m_top1 = _top1;
+    this.m_top2 = _top2;
     this.m_bottom = _bottom;
 
     if (m_top1 != null) {
       setupMotor(m_top1);
+      m_top1.setInverted(InvertType.InvertMotorOutput);
 
       //for PID you have to have a sensor to check on so you know the error
       m_top1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, kVelocitySlotIdx, kTimeoutMs);
@@ -81,10 +83,10 @@ public class ShooterSubsystem extends SubsystemBase {
     m.setInverted(InvertType.None);
 
     //set max and minium(nominal) speed in percentage output
-    m_top1.configNominalOutputForward(0, kTimeoutMs);
-    m_top1.configNominalOutputReverse(0, kTimeoutMs);
-    m_top1.configPeakOutputForward(+1, kTimeoutMs);
-    m_top1.configPeakOutputReverse(-1, kTimeoutMs);
+    m.configNominalOutputForward(0, kTimeoutMs);
+    m.configNominalOutputReverse(0, kTimeoutMs);
+    m.configPeakOutputForward(+1, kTimeoutMs);
+    m.configPeakOutputReverse(-1, kTimeoutMs);
     
     StatorCurrentLimitConfiguration amprage=new StatorCurrentLimitConfiguration(true,40,0,0); 
     m.configStatorCurrentLimit(amprage);
